@@ -1,4 +1,5 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import firestore from "@react-native-firebase/firestore"
 
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
@@ -34,7 +35,13 @@ export const AuthenticationStoreModel = types
       store.name = value
     },
     async addUserToFireStore() {
-
+      await firestore()
+        .collection('Users')
+        .add({
+          name: store.name,
+          avatar: store.avatar,
+          email: store.authEmail
+        })
     },
     logout() {
       store.avatar = ''
