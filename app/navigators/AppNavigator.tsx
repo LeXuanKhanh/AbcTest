@@ -72,7 +72,7 @@ const AppStack = observer(function AppStack() {
       {isAuthenticated ? (
         <>
           {/* @demo remove-block-end */}
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+          {/* <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} /> */}
           {/* @demo remove-block-start */}
           <Stack.Screen name="Demo" component={DemoNavigator} />
         </>

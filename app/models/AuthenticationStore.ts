@@ -3,8 +3,10 @@ import { Instance, SnapshotOut, types } from "mobx-state-tree"
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
   .props({
+    name: "",
     authToken: types.maybe(types.string),
     authEmail: "",
+    avatar: "",
   })
   .views((store) => ({
     get isAuthenticated() {
@@ -25,7 +27,18 @@ export const AuthenticationStoreModel = types
     setAuthEmail(value: string) {
       store.authEmail = value.replace(/ /g, "")
     },
+    setAvatar(value: string) {
+      store.avatar = value
+    },
+    setName(value: string) {
+      store.name = value
+    },
+    async addUserToFireStore() {
+
+    },
     logout() {
+      store.avatar = ''
+      store.name = ''
       store.authToken = undefined
       store.authEmail = ""
     },

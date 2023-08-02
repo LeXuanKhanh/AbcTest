@@ -3,6 +3,9 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTLinkingManager.h>
+#import <Firebase.h>
+#import <RNGoogleSignin/RNGoogleSignin.h>
+#import <FBSDKCoreKit/FBSDKCoreKit-swift.h>
 
 @implementation AppDelegate
 
@@ -19,6 +22,10 @@
   // RN BootSplash
   UIView *rootView = self.window.rootViewController.view; // react-native >= 0.71 specific
   [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
+  [FIRApp configure];
+  [[FBSDKApplicationDelegate sharedInstance] application:application
+                         didFinishLaunchingWithOptions:launchOptions];
+  [FBSDKApplicationDelegate.sharedInstance initializeSDK];
 
   return YES;
 }
@@ -44,7 +51,9 @@
 
 // Linking API
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-  return [super application:application openURL:url options:options] || [RCTLinkingManager application:application openURL:url options:options];
+  return [super application:application openURL:url options:options] || [RCTLinkingManager application:application openURL:url options:options] ||
+  [RNGoogleSignin application:application openURL:url options:options] ||
+  [[FBSDKApplicationDelegate sharedInstance] application:application openURL:url options:options];
 }
 
 // Universal Links

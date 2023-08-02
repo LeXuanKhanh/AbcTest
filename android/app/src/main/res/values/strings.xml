@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AbcTest</string>
+    <string name="facebook_app_id">1151394622916031</string>
+    <string name="facebook_client_token">0efe194af33e797759acc89a905f7869</string>
 </resources>
