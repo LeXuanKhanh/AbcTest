@@ -12,14 +12,16 @@ import {
 } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { observer } from "mobx-react-lite"
-import React from "react"
-import { useColorScheme } from "react-native"
+import React, { useEffect } from "react"
+import { Alert, Platform, useColorScheme, PermissionsAndroid } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
 import { useStores } from "../models" // @demo remove-current-line
 import { DemoNavigator, DemoTabParamList } from "./DemoNavigator" // @demo remove-current-line
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
+import messaging from "@react-native-firebase/messaging"
+import notifee from '@notifee/react-native';
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -61,6 +63,38 @@ const AppStack = observer(function AppStack() {
   const {
     authenticationStore: { isAuthenticated },
   } = useStores()
+
+  useEffect(() => {
+    initialization().then(() => {
+      console.log('initialization completed')
+    })
+  }, [])
+
+  const initialization = async () => {
+    if (Platform.OS === "android") {
+      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    }
+
+    await checkToken()
+
+    messaging().onMessage(async remoteMessage => {
+      console.log(`push notification ${JSON.stringify(remoteMessage)}`)
+      Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+    });
+  }
+
+  const checkToken = async () => {
+    try {
+      const fcmToken = await messaging().getToken();
+      if (fcmToken) {
+        console.log(`fcmToken: ${fcmToken}`)
+      } else {
+        console.log(`fcmToken: not found`)
+      }
+    } catch (e) {
+
+    }
+  }
 
   // @demo remove-block-end
   return (

@@ -1,12 +1,13 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useRef, useState } from "react"
-import { ImageStyle, TextInput, TextStyle, TouchableOpacity, View, ViewStyle, Image } from "react-native"
+import { ImageStyle, TextInput, TextStyle, TouchableOpacity, View, ViewStyle, Image, Alert } from "react-native"
 import { Screen, Text } from "../components"
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { LoginManager, AccessToken } from "react-native-fbsdk-next";
 import auth from '@react-native-firebase/auth';
+import messaging from '@react-native-firebase/messaging';
 
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
@@ -75,40 +76,48 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   async function onGoogleButtonPress() {
-    // Check if your device supports Google Play
-    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true }).catch(e => {
-      console.error(e)
-    });
-    // Get the users ID token
-    const { idToken } = await GoogleSignin.signIn();
+    try {
+      // Check if your device supports Google Play
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true }).catch(e => {
+        console.error(e)
+      });
+      // Get the users ID token
+      const { idToken } = await GoogleSignin.signIn();
 
-    // Create a Google credential with the token
-    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      // Create a Google credential with the token
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
-    // Sign-in the user with the credential
-    return auth().signInWithCredential(googleCredential);
+      // Sign-in the user with the credential
+      await auth().signInWithCredential(googleCredential);
+    } catch (e) {
+      Alert.alert("Error Login With Google", e);
+    }
   }
 
   async function onFacebookButtonPress() {
-    // Attempt login with permissions
-    const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+    try {
+      // Attempt login with permissions
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
 
-    if (result.isCancelled) {
-      throw 'User cancelled the login process';
+      if (result.isCancelled) {
+        throw 'User cancelled the login process';
+      }
+
+      // Once signed in, get the users AccessToken
+      const data = await AccessToken.getCurrentAccessToken();
+
+      if (!data) {
+        throw 'Something went wrong obtaining access token';
+      }
+
+      // Create a Firebase credential with the AccessToken
+      const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+
+      // Sign-in the user with the credential
+      await auth().signInWithCredential(facebookCredential);
+    } catch (e) {
+      Alert.alert("Error Login With Facebook", e);
     }
-
-    // Once signed in, get the users AccessToken
-    const data = await AccessToken.getCurrentAccessToken();
-
-    if (!data) {
-      throw 'Something went wrong obtaining access token';
-    }
-
-    // Create a Firebase credential with the AccessToken
-    const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
-
-    // Sign-in the user with the credential
-    return auth().signInWithCredential(facebookCredential);
   }
 
   const IconButton = ({type, onPress}) => {

@@ -1,12 +1,14 @@
-import React, { FC, useEffect } from "react"
+import React, { FC, useEffect, useState } from "react"
 import * as Application from "expo-application"
-import { Linking, Platform, TextStyle, View, ViewStyle } from "react-native"
+import { Alert, Linking, Platform, TextStyle, View, ViewStyle } from "react-native"
 import { Button, ListItem, Screen, Text } from "../components"
 import { DemoTabScreenProps } from "../navigators/DemoNavigator"
 import { colors, spacing } from "../theme"
 import { isRTL } from "../i18n"
 import { useStores } from "../models"
 import auth from "@react-native-firebase/auth"
+import messaging from "@react-native-firebase/messaging"
+import Clipboard from '@react-native-clipboard/clipboard';
 
 function openLinkInBrowser(url: string) {
   Linking.canOpenURL(url).then((canOpen) => canOpen && Linking.openURL(url))
@@ -19,6 +21,8 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function Dem
     authenticationStore: { logout },
   } = useStores()
 
+  const [fcmToken, setFcmToken] = useState("")
+
   const usingHermes = typeof HermesInternal === "object" && HermesInternal !== null
 
   const logOutFromApp = () => {
@@ -28,6 +32,7 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function Dem
   }
 
   useEffect(() => {
+    checkToken().then()
     return auth().onAuthStateChanged(onAuthStateChanged)
   }, [])
 
@@ -35,6 +40,24 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function Dem
     if (!user) {
       logout()
     }
+  }
+
+  const checkToken = async () => {
+    try {
+      const token = await messaging().getToken();
+      if (token) {
+        console.log(`fcmToken in debug: ${token}`)
+        setFcmToken(token)
+      } else {
+        console.log(`fcmToken in debug: not found`)
+      }
+    } catch (e) {
+
+    }
+  }
+  const copyToClipBoard = async() => {
+    Clipboard.setString(fcmToken)
+    Alert.alert(null,'copied to clipboard')
   }
 
   const demoReactotron = React.useMemo(
@@ -94,6 +117,15 @@ export const DemoDebugScreen: FC<DemoTabScreenProps<"DemoDebug">> = function Dem
             <View style={$item}>
               <Text preset="bold">App Build Version</Text>
               <Text>{Application.nativeBuildVersion}</Text>
+            </View>
+          }
+        />
+        <ListItem
+          onPress={copyToClipBoard}
+          LeftComponent={
+            <View style={$item}>
+              <Text preset="bold">Device Token (Tap to copy)</Text>
+              <Text>{fcmToken}</Text>
             </View>
           }
         />
