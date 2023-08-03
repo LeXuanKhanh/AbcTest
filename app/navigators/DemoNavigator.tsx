@@ -5,7 +5,7 @@ import { Animated, Dimensions, Modal, TextStyle, TouchableHighlight, ViewStyle }
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { Icon } from "../components"
 import { translate } from "../i18n"
-import { DemoCommunityScreen, DemoShowroomScreen, DemoDebugScreen } from "../screens"
+import { HomeScreen, DemoShowroomScreen, SettingScreen } from "../screens"
 import { DemoPodcastListScreen } from "../screens/DemoPodcastListScreen"
 import { colors, spacing, typography } from "../theme"
 import { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
@@ -57,7 +57,7 @@ export function DemoNavigator() {
 
       <Tab.Screen
         name="DemoCommunity"
-        component={DemoCommunityScreen}
+        component={HomeScreen}
         options={{
           tabBarLabel: 'User Manager',
           tabBarIcon: ({ focused }) => (
@@ -82,7 +82,7 @@ export function DemoNavigator() {
 
       <Tab.Screen
         name="DemoDebug"
-        component={DemoDebugScreen}
+        component={SettingScreen}
         options={{
           tabBarLabel: 'Settings',
           tabBarIcon: ({ focused }) => (

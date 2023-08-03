@@ -10,7 +10,7 @@ const reactNativeLiveLogo = require("../../assets/images/rnl-logo.png")
 const reactNativeRadioLogo = require("../../assets/images/rnr-logo.png")
 const reactNativeNewsletterLogo = require("../../assets/images/rnn-logo.png")
 
-export const DemoCommunityScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
+export const HomeScreen: FC<DemoTabScreenProps<"DemoCommunity">> =
   function DemoCommunityScreen(_props) {
     const [loading, setLoading] = useState(true); // Set loading to true on component mount
     const [users, setUsers] = useState([]);
